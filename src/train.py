@@ -168,6 +168,11 @@ def run_training(data_path: Path | str = DATA_PATH) -> dict:
                   f"test recall={exp['test']['recall']:.3f}  test F1={exp['test']['f1']:.3f}")
 
     print("5/6 Selecting final model by cross-validated F2 (training data only) ...")
+    if not experiments:
+      raise RuntimeError(
+        "No experiments completed successfully. Check the warnings above "
+        "(e.g., missing imbalanced-learn or a scikit-learn/SMOTENC version mismatch)."
+      )
     best = max(experiments, key=lambda e: e["cv"]["f2_mean"])
     pipe = fitted[(best["model"], best["strategy"])]
     oof = cross_val_predict(clone(pipe), X_train, y_train, cv=cv, method="predict_proba")[:, 1]

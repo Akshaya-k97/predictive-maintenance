@@ -127,17 +127,18 @@ def fig_strategy_comparison(results: dict) -> go.Figure:
     fig.update_yaxes(title="Cross-validated F2 (training data)", range=[0, 1.05])
     return apply_theme(fig, "Imbalance handling: cross-validated F2 (mean +/- std)")
 
-
 def fig_confusion_matrix(m: dict, title: str) -> go.Figure:
     z = [[m["tn"], m["fp"]], [m["fn"], m["tp"]]]
     labels = [["True negative", "False positive"], ["False negative", "True positive"]]
     text = [[f"{labels[i][j]}<br>{z[i][j]}" for j in range(2)] for i in range(2)]
+    # Scale the color axis to the *smallest* off-diagonal max, so small cells remain visible
+    vmax = max(z[0][1], z[1][0], z[1][1], 1)
     fig = go.Figure(go.Heatmap(z=z, x=["Predicted: No failure", "Predicted: Failure"],
                                y=["Actual: No failure", "Actual: Failure"], text=text,
-                               texttemplate="%{text}", colorscale="Blues", showscale=False))
+                               texttemplate="%{text}", colorscale="Blues", showscale=False,
+                               zmin=0, zmax=vmax))
     fig.update_yaxes(autorange="reversed")
     return apply_theme(fig, title, height=360)
-
 
 def fig_roc(results: dict, selected_label: str) -> go.Figure:
     fig = go.Figure()

@@ -135,7 +135,7 @@ def build_preprocessor() -> ColumnTransformer:
     """
     return ColumnTransformer(
         [
-            ("type", OrdinalEncoder(categories=[TYPE_CATEGORIES]), [CATEGORICAL_FEATURE]),
+            ("type", OrdinalEncoder(categories=[TYPE_CATEGORIES], dtype=int), [CATEGORICAL_FEATURE]),
             ("num", Pipeline([("impute", SimpleImputer(strategy="median")),
                               ("scale", StandardScaler())]), NUMERIC_FEATURES),
         ]

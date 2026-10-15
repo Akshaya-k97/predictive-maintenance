@@ -107,7 +107,7 @@ def input_form(bundle):
     for k, v in ex.items():
         st.session_state.setdefault(f"in_{k}", v)
     c1, c2, c3 = st.columns(3)
-    c1.selectbox("Machine type (L / M / H quality)", TYPE_CATEGORIES, key="in_Type")
+    c1.selectbox("Machine type (L / M / H quality)", TYPE_CATEGORIES, index=TYPE_CATEGORIES.index(bundle["example_values"]["Type"]), key="in_Type")
     for col, container in zip(NUMERIC_FEATURES, [c2, c3, c1, c2, c3]):
         r = rng[col]
         label = f"{DISPLAY_NAMES[col]} [{UNITS[col]}]"

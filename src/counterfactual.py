@@ -70,11 +70,16 @@ def find_counterfactuals(bundle: dict, inputs: dict, mutable_features=None,
     combos = np.array([",".join(c) for c in combos])
 
     d = bundle["temp_diff_range"]
+    original_gap = float(original["process_temp"]) - float(original["air_temp"])
     gap = cand["process_temp"] - cand["air_temp"]
-    ok = ((gap >= d["min"]) & (gap <= d["max"])).values        # realistic temperature gap
-    cand, combos = cand[ok].reset_index(drop=True), combos[ok]
+    # Only enforce the gap range if the machine starts inside it; otherwise
+    # we'd reject every candidate for machines that begin out-of-range.
+    if d["min"] <= original_gap <= d["max"]:
+        ok = ((gap >= d["min"]) & (gap <= d["max"])).values
+        cand, combos = cand[ok].reset_index(drop=True), combos[ok]
     if cand.empty:
-        out["message"] = "No plausible candidates remained after applying the plausibility rules."
+        out["message"] = ("No plausible candidates remained after applying the plausibility rules. "
+                        "Try allowing more features to change or a larger max change.")
         return out
 
     proba = pipe.predict_proba(cand[FEATURE_COLUMNS])[:, 1]    # real model, every candidate
